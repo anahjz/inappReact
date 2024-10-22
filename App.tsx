@@ -1,118 +1,96 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import React, {useEffect, useState} from 'react';
+import {View} from 'react-native';
+import {Text} from 'react-native';
+import {Image} from 'react-native';
+import {Button} from 'react-native';
+import {StyleSheet} from 'react-native';
+import InTrack from 'intrack-react-native-bridge';
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
-
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
-
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
-
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+const MyComponent: React.FC = () => {
+  const [inTrackIDText, setInTrackIDText] = useState('inTrackID');
+  const handleEventTrigger = () => {
+    console.log("'intrack_engagement_party' event clicked!");
+    // Record intrack_engagement_party event
+    InTrack.sendEvent({
+      eventName: 'intrack_engagement_party_custom',
+    });
   };
 
+  const initIntrack = async () => {
+    // if (!(await InTrack.isInitialized())) {
+    const options = {
+      appKey: 'AAAAAg',
+      iosAuthKey: 'ّeb1c4f83-78c6-43cb-aa6a-9744d4f95cc6',
+      androidAuthKey: '562f902b-5145-42a0-a5ab-61046179e018',
+      loggingEnabled: true,
+      enableInAppMessaging: true,
+      // inAppDefaultTheme: {
+      //   titleColor: '#000000',
+      //   descriptionColor: '#000000',
+      //   bgColor: '#ffffff',
+      //   actionLabelColor: '#000000',
+      //   actionBgColor: '#ffffff',
+      // },
+    };
+    await InTrack.init(options);
+    InTrack.start();
+    //  }
+  };
+
+  useEffect(() => {
+    initIntrack();
+    InTrack.getDeviceId((deviceId: string) => {
+      setInTrackIDText('DeviceID:' + deviceId);
+      console.log('DeviceID: ' + deviceId);
+    });
+  }, []);
+
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
+    <View style={styles.container}>
+      <Image
+        source={require('./src/ic_launcher_adaptive_fore.png')}
+        style={styles.image}
       />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+      <Text style={styles.text}>
+        Welcome to the InTrack In-App Messaging Quickstart app. Press the button
+        to trigger an analytics events!
+      </Text>
+      <Text style={styles.installationIdText}>{inTrackIDText}</Text>
+      <View style={styles.eventTriggerButton}>
+        <Button
+          title="Trigger intrack_engagement_party event"
+          onPress={handleEventTrigger}
+        />
+      </View>
+    </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  container: {
+    flex: 1,
+    padding: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
+  image: {
+    width: '30%',
+    height: '30%',
+    marginVertical: 8,
   },
-  sectionDescription: {
-    marginTop: 8,
+  text: {
     fontSize: 18,
-    fontWeight: '400',
+    marginVertical: 8,
   },
-  highlight: {
-    fontWeight: '700',
+  installationIdText: {
+    fontSize: 18,
+    marginVertical: 8,
+  },
+  eventTriggerButton: {
+    marginVertical: 8,
+    padding: 10,
+    borderRadius: 10,
   },
 });
 
-export default App;
+export default MyComponent;

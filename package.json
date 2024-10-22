@@ -10,6 +10,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "intrack-react-native-bridge": "file:/Users/anahejazi/Desktop/Smartech/reactsdk/intrack-react-native-sdk",
     "react": "18.2.0",
     "react-native": "0.74.0"
   },
